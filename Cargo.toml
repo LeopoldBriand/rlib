@@ -3,4 +3,5 @@
 members = [
     "gret",
     "create",
+    "remove",
 ]
