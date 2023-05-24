@@ -1,0 +1,27 @@
+// Check for readable input
+// This code is copied from BurntSushi/ripgrep crates/cli/src/lib.rs
+
+pub fn is_readable_stdin() -> bool {
+    #[cfg(unix)]
+    fn imp() -> bool {
+        use same_file::Handle;
+        use std::os::unix::fs::FileTypeExt;
+
+        let ft = match Handle::stdin().and_then(|h| h.as_file().metadata()) {
+            Err(_) => return false,
+            Ok(md) => md.file_type(),
+        };
+        ft.is_file() || ft.is_fifo() || ft.is_socket()
+    }
+
+    #[cfg(windows)]
+    fn imp() -> bool {
+        use winapi_util as winutil;
+
+        winutil::file::typ(winutil::HandleRef::stdin())
+            .map(|t| t.is_disk() || t.is_pipe())
+            .unwrap_or(false)
+    }
+
+    !atty::is(atty::Stream::Stdin) && imp()
+}

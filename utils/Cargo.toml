@@ -1,0 +1,9 @@
+[package]
+name = "utils"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+same-file = "1.0.4"
+atty = "0.2.11"

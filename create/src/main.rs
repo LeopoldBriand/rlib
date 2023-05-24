@@ -1,5 +1,6 @@
 use std::{io::{self, Write}, fs};
 use clap::{Parser};
+use utils::is_readable_stdin;
 
 /// Simple program to create files and folders
 #[derive(Parser, Debug)]
@@ -18,9 +19,10 @@ fn main() -> std::io::Result<()> {
         fs::create_dir_all(args.path)
     } else {
         let mut file = fs::File::create(args.path)?;
-        // TODO: Check if stdin buffer is empty or not before reading data
-        let stdin_data: Vec<String> = io::stdin().lines().filter_map(|d| d.ok()).collect();
-        file.write(&stdin_data.join("\n").into_bytes())?;
+        if is_readable_stdin() {
+            let stdin_data: Vec<String> = io::stdin().lines().filter_map(|d| d.ok()).collect();
+            file.write(&stdin_data.join("\n").into_bytes())?;
+        }
         Ok(())
     }
 }

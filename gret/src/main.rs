@@ -1,6 +1,7 @@
 use std::{io::{self, Write}};
 use clap::{Parser};
 use regex::Regex;
+use utils::is_readable_stdin;
 
 /// Simple program find patterns in files or pipelines
 #[derive(Parser, Debug)]
@@ -21,6 +22,9 @@ struct Args {
 
 fn main() -> io::Result<()>{
     let args = Args::parse();
+    if !is_readable_stdin() {
+        panic!("Please provide data to stdin")
+    }
     let stdin_data: Vec<String> = io::stdin().lines().filter_map(|d| d.ok()).collect();
     let regex = Regex::new(&args.regex).unwrap();
     let result = search(stdin_data, regex.clone());
