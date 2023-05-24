@@ -7,7 +7,7 @@ use utils::is_readable_stdin;
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// The path to create
-    path: String,
+    paths: Vec<String>,
     /// The created object is a directory
     #[arg(short= 'd', long)]
     directory: bool,
@@ -15,14 +15,16 @@ struct Args {
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
-    if args.directory {
-        fs::create_dir_all(args.path)
-    } else {
-        let mut file = fs::File::create(args.path)?;
-        if is_readable_stdin() {
-            let stdin_data: Vec<String> = io::stdin().lines().filter_map(|d| d.ok()).collect();
-            file.write(&stdin_data.join("\n").into_bytes())?;
+    for path in args.paths {
+        if args.directory {
+            fs::create_dir_all(path)?
+        } else {
+            let mut file = fs::File::create(path)?;
+            if is_readable_stdin() {
+                let stdin_data: Vec<String> = io::stdin().lines().filter_map(|d| d.ok()).collect();
+                file.write(&stdin_data.join("\n").into_bytes())?;
+            }
         }
-        Ok(())
     }
+    Ok(())
 }
